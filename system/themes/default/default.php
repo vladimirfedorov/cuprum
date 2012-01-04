@@ -13,11 +13,21 @@
 
   <div id="container">
     <header>
-		[[.header]]
+		<div class="sitename">cuprum</div>
+		<div id="menu">
+			<ul>
+				<li><a href="/blog">Blog</a></li>
+				<li><a href="/about">About</a></li>
+				<li><a href="/articles">Articles</a></li>
+			</ul>
+		</div>
+		<div id="login">
+			[[:sys.login]]
+		</div>
     </header>
     <hr />
     <div id="main" role="main">
-
+		
 		<b>Record id: [[=P.id]]</b>
 		<br />
 		[[=P.text]]

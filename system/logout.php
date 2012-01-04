@@ -1,5 +1,6 @@
 <?php
 require_once 'core.php';
 Auth::logout();
-header('Location: /');
+$ret = (isset($_GET['ret']) ? $_GET['ret'] : '/');
+header("Location: $ret");
 ?>

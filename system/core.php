@@ -139,26 +139,14 @@ class Auth {
 		if (count($r) == 1) {
 			session_start();
 			$_SESSION['status'] = 'authorized';
+			$_SESSION['authname'] = $r[0]['name'];
+			$_SESSION['authrole'] = $r[0]['role'];
 			$r[0]['pwd'] = '';
 			return $r[0];
 		}
 		return null;
 	}
 
-	function loginRole($username, $password, $role) {
-		$pwdhash = self::pwdHash($username, $password);
-		$username = mysql_real_escape_string($username);
-		$role = mysql_real_escape_string($role);
-		$r = DB::getRows('users', "`name`='$username' And `pwd`='$pwdhash' And `role`='$role'");
-		if (count($r) == 1) {
-			session_start();
-			$_SESSION['status'] = 'authorized';
-			$r[0]['pwd'] = '';
-			return $r[0];
-		}
-		return null;
-	}
-	
 	function validate() {
 		session_start();
 		if ($_SESSION['status'] == 'authorized')
@@ -170,9 +158,13 @@ class Auth {
 	function logout() {
 		session_start();
 		unset($_SESSION['status']);
+		unset($_SESSION['authname']);
+		unset($_SESSION['authrole']);
 		session_unset();
 		session_destroy();
 		setcookie("status", "",time()-60*60*24*100, "/");
+		setcookie("authname", "",time()-60*60*24*100, "/");
+		setcookie("authrole", "",time()-60*60*24*100, "/");
 	}
 	
 	function pwdHash($username, $password) {
@@ -182,6 +174,11 @@ class Auth {
 	function getAuthForm() {
 		$f = "";
 		return $f;
+	}
+	
+	function userName() {
+		return (self::validate() ? $_SESSION['authname'] : '');
+			
 	}
 }
 
@@ -197,10 +194,10 @@ class Template {
 		if ($templateName == '')
 			$templateName = 'default';
 		
-		$templateName = THEME . "/$templateName.php";
+		$templateName = ROOTDIR.THEME."/$templateName.php";
 
 		if (!file_exists($templateName)) 
-			$templateName = THEME. '/default.php';
+			$templateName = THEME.'/default.php';
 		
 		if (!file_exists($templateName))
 			return "Template not found: $templateName";
@@ -208,7 +205,6 @@ class Template {
 		$template = $this->readFile($templateName);
 		$template = $this->processVariables($template);
 		$template = $this->processPlugins($template);
-		
 		$template = $this->processTemplates($template);
 				
 		return $template;
@@ -253,7 +249,7 @@ class Template {
 					$p = str_replace("[[=$varName]]", $this->vars[$varName], $p);
 			}
 			
-			$o = $varNameStart+1;
+			$o = $pos+1;
 			if ($o > strlen($p))
 				break;
 		}
@@ -264,7 +260,6 @@ class Template {
 	function processPlugins($p) {
 		$o = 0;
 		$maxSteps = MAXITERATIONS;
-
 		while (false !== ($pos = strpos($p, "[[:", $o)) && (--$maxSteps>0)) {
 			$pluginNameStart = $pos + 3;
 			$pluginNameEnd = strpos($p, ']]', $pluginNameStart);
@@ -275,20 +270,24 @@ class Template {
 			$ex = explode(' ', $pluginName);	
 			$pluginName = $ex[0];
 				
-			$up = USERPLUGINS . $pluginName . '/index.php';
-			$sp = SYSTEMPLUGINS . $pluginName . '/index.php';
+			$up = ROOTDIR.USERPLUGINS.$pluginName . '/main.php';
+			$sp = ROOTDIR.SYSTEMPLUGINS.$pluginName . '/main.php';
 			
 			$pluginPath = (file_exists($up) ? $up : 
 				(file_exists($sp) ? $sp : ''));
 
-			if ($pluginPath == '')
+			if ($pluginPath == '') {
+				if (REMOVENONEXISTENT)
+					$p = str_replace("[[:$pluginNameFull]]", '', $p);
 				continue;
+			}
 			
 			$pluginOut = $this->readFile($pluginPath, $ex);
+			$pluginOut = $this->processVariables($pluginOut);
 			
 			$p = str_replace("[[:$pluginNameFull]]", $pluginOut, $p);
 			
-			$o = $pluginNameStart+1;
+			$o = $pos+1;
 			if ($o > strlen($p))
 				break;
 		}
@@ -304,7 +303,7 @@ class Template {
 			$templateNameEnd = strpos($p, ']]', $templateNameStart);
 			$templateName = substr($p, $templateNameStart, ($templateNameEnd-$templateNameStart));
 				
-			$templatePath = THEME . "/$templateName";
+			$templatePath = ROOTDIR.THEME."/$templateName";
 			
 			$templatePath = (file_exists("$templatePath.php") ? "$templatePath.php" : 
 				(file_exists("$templatepath.html") ? "$templatePath.html" : ''));
@@ -319,7 +318,7 @@ class Template {
 			
 			$p = str_replace("[[.$templateName]]", $template, $p);
 			
-			$o = $templateNameStart+1;
+			$o = $pos+1;
 			if ($o > strlen($p))
 				break;
 		}
@@ -358,23 +357,19 @@ class Site {
 		$p = strtolower($_SERVER['REQUEST_URI']);
 		$p = explode('?', $p);
 		$p = $p[0];
-		//echo ($p == '/' ? 'main' : $p) . "<br />";
 		
 		$content = "";
-		
-		if (substr($p, 0, 8) == '/system/')
-			return;
 		
 		// predefined routes
 		switch ($p) {
 			case '/edit': 	// edit
-				$content = self::processFile('system/edit.php');
+				$content = self::processFile(ROOTDIR.'/system/edit.php');
 				break;
 			case '/login':
-				$content = self::processFile('system/login.php');
+				$content = self::processFile(ROOTDIR.'system/login.php');
 				break;
 			case '/logout':
-				$content = self::processFile('system/logout.php');
+				$content = self::processFile(ROOTDIR.'system/logout.php');
 				break;
 			default:
 				$content = self::processPage($p);

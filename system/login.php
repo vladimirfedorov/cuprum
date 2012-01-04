@@ -2,10 +2,7 @@
 require_once 'core.php';
 $ret = (isset($_GET['ret']) ? $_GET['ret'] : '/');
 
-
 if (Auth::validate()) header("Location: $ret");
-
-
 
 if ( isset($_POST['username']) && isset($_POST['password']) ) {
 	$u = Auth::login($_POST['username'], $_POST['password']);
@@ -21,6 +18,3 @@ if ( isset($_POST['username']) && isset($_POST['password']) ) {
 	<input type="submit" value="Login" />
 	
 </form>
-<?php
-
-?>
