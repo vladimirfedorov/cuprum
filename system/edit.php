@@ -1,30 +1,19 @@
 <?php
-ob_start();
-chdir('..');
-
-header('Content-type: text/html; charset=utf-8');
 require_once 'core.php';
+header('Content-type: text/html; charset=utf-8');
+
+$ret = '/edit?' . $_SERVER['QUERY_STRING'];
+if (!Auth::validate()) header('Location: /login?ret=' . $ret);
+
 
 if(isset($_POST['db_id'])) {
 	$id = DB::saveFormData('content');
 	
 	if ($_POST['db_id'] == ''){
-		//echo "Location: edit.php?id=$id";
 		header("Location: edit.php?id=$id");
 		exit;
 	};
 }
-
-
-
-
-if ( !(isset($_GET['id']) || isset($_GET['type'])) || 
-		(isset($_GET['id']) && ! is_numeric($_GET['id'])) ||
-		(isset($_GET['type']) && ! is_numeric($_GET['type'])) ) {
-	header('Location: /');
-	exit;
-}
-
 
 $id = $_GET['id'];
 $type = $_GET['type'];
@@ -44,8 +33,8 @@ $l = DB::getRows('content',"`type`=$type");
 // FORM ///////////////////////////////////////////////////////////////////////
 ?>
 
-<script src="js/jquery-1.7.1.min.js" language="JavaScript"></script>
-<script src="js/jquery.cookie.js" language="JavaScript"></script>
+<script src="system/js/jquery-1.7.1.min.js" language="JavaScript"></script>
+<script src="system/js/jquery.cookie.js" language="JavaScript"></script>
 
 <script>
 	$(document).ready(function(){
@@ -92,9 +81,9 @@ $l = DB::getRows('content',"`type`=$type");
 </style>
 
 <div class="createLinks">
-	<a href="/system/edit.php?type=0">Pages</a>
-	<a href="/system/edit.php?type=1">Posts</a>
-	<a href="/system/edit.php?id=0&type=<?php echo $type ?>">Create new</a>
+	<a href="?type=0">Pages</a>
+	<a href="?type=1">Posts</a>
+	<a href="?id=0&type=<?php echo $type ?>">Create new</a>
 </div>
 
 <form name="editor" id="editor" method="post" action="<?php echo $_SERVER['REQUEST_URI'] ?>">
@@ -103,13 +92,12 @@ $l = DB::getRows('content',"`type`=$type");
 		<?php
 			foreach ($l as $v) {
 				 
-				echo "<a " . ($v['id'] == $id ? 'class="active"' : '' ) . " href='/system/edit.php?id={$v['id']}'>" . 
+				echo "<a " . ($v['id'] == $id ? 'class="active"' : '' ) . " href='/edit?id={$v['id']}'>" . 
 					($v['deleted']==1 ? '<s>' : '') .
 					"{$v['title']}" . 
 					($v['deleted']==1 ? '</s>' : '') .
 					($v['draft']==1 ? '*' :'') .
 					"</a>" 
-					
 					;
 			}
 		?>
@@ -182,15 +170,3 @@ $l = DB::getRows('content',"`type`=$type");
 	</div>
 </form>
 
-
-
-<?php
-	$p = ob_get_contents();
-	ob_end_clean();
-	
-	$t = new Template();
-	$t->assign('P', $p);
-	$content = $t->process('system');
-	
-	echo $content;
-?>

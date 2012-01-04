@@ -90,7 +90,6 @@ class DB {
         
         if ($fields != "") {
             $query = "Update $table Set $fields Where `id`=$id";
-			//echo $query;
             $res = mysql_query($query);
             if ($res)
                 return $id;
@@ -136,12 +135,12 @@ class Auth {
 	function login($username, $password) {
 		$pwdhash = self::pwdHash($username, $password);
 		$username = mysql_real_escape_string($username);
-		$role = mysql_real_escape_string($role);
 		$r = DB::getRows('users', "`name`='$username' And `pwd`='$pwdhash'");
-		if (count($r) > 0) {
+		if (count($r) == 1) {
 			session_start();
 			$_SESSION['status'] = 'authorized';
-			return $r;
+			$r[0]['pwd'] = '';
+			return $r[0];
 		}
 		return null;
 	}
@@ -151,10 +150,11 @@ class Auth {
 		$username = mysql_real_escape_string($username);
 		$role = mysql_real_escape_string($role);
 		$r = DB::getRows('users', "`name`='$username' And `pwd`='$pwdhash' And `role`='$role'");
-		if (count($r) > 0) {
+		if (count($r) == 1) {
 			session_start();
 			$_SESSION['status'] = 'authorized';
-			return $r;
+			$r[0]['pwd'] = '';
+			return $r[0];
 		}
 		return null;
 	}
@@ -176,7 +176,12 @@ class Auth {
 	}
 	
 	function pwdHash($username, $password) {
-		return hash('sha512',$password) ;
+		return hash('sha512', $password) ;
+	}
+	
+	function getAuthForm() {
+		$f = "";
+		return $f;
 	}
 }
 
@@ -351,7 +356,9 @@ class Site {
 	/// Show page
 	function displayPage() {
 		$p = strtolower($_SERVER['REQUEST_URI']);
-		//echo ($pg == '/' ? 'main' : $pg) . "<br />";
+		$p = explode('?', $p);
+		$p = $p[0];
+		//echo ($p == '/' ? 'main' : $p) . "<br />";
 		
 		$content = "";
 		
@@ -360,9 +367,15 @@ class Site {
 		
 		// predefined routes
 		switch ($p) {
-			case '/edit': 										// edit
-				header('Location: /system/edit.php?type=0');
-				exit;
+			case '/edit': 	// edit
+				$content = self::processFile('system/edit.php');
+				break;
+			case '/login':
+				$content = self::processFile('system/login.php');
+				break;
+			case '/logout':
+				$content = self::processFile('system/logout.php');
+				break;
 			default:
 				$content = self::processPage($p);
 				break;
@@ -383,6 +396,16 @@ class Site {
 		$t = new Template();
 		$t->assign('P', $p);
 		$content = $t->process($p['template']);
+		
+		return $content;
+	}
+	
+	/// Display a file using default file template
+	function processFile($f) {
+		$t = new Template();
+		$c = $t->readFile($f);
+		$t->assign('P', $c);
+		$content = $t->process(FILETEMPLATE);
 		
 		return $content;
 	}
