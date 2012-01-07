@@ -162,9 +162,9 @@ class Auth {
 		unset($_SESSION['authrole']);
 		session_unset();
 		session_destroy();
-		setcookie("status", "",time()-60*60*24*100, "/");
-		setcookie("authname", "",time()-60*60*24*100, "/");
-		setcookie("authrole", "",time()-60*60*24*100, "/");
+		setcookie("status", "", time()-60*60*24*100, "/");
+		setcookie("authname", "", time()-60*60*24*100, "/");
+		setcookie("authrole", "", time()-60*60*24*100, "/");
 	}
 	
 	function pwdHash($username, $password) {
@@ -172,13 +172,17 @@ class Auth {
 	}
 	
 	function getAuthForm() {
-		$f = "";
+		$ret = (isset($_GET['ret']) ? $_GET['ret'] : '/');
+		$f = "<form action='/login?ret=$ret' method='POST'>" .
+			"<input class='loginFormInput' id='username' name='username' type='text' />&nbsp;" .
+			"<input class='loginFormInput' id='password' name='password' type='password' />&nbsp;" .
+			"<input type='submit' value='Login' />" .
+			"</form>";
 		return $f;
 	}
 	
 	function userName() {
 		return (self::validate() ? $_SESSION['authname'] : '');
-			
 	}
 }
 
@@ -197,7 +201,7 @@ class Template {
 		$templateName = ROOTDIR.THEME."/$templateName.php";
 
 		if (!file_exists($templateName)) 
-			$templateName = THEME.'/default.php';
+			$templateName = ROOTDIR.THEME.'/default.php';
 		
 		if (!file_exists($templateName))
 			return "Template not found: $templateName";
@@ -241,12 +245,22 @@ class Template {
 				$ex = explode('.', $varName);	
 				$varName = $ex[0];
 				$varDim = $ex[1];
-				if (isset($this->vars[$varName][$varDim]))
+				if (isset($this->vars[$varName][$varDim])) {
 					$p = str_replace("[[=$varNameFull]]", $this->vars[$varName][$varDim], $p);
+				}
+				else {
+					if (REMOVENONEXISTENT)
+						$p = str_replace("[[=$varNameFull]]", '', $p);
+				}
 			}
 			else {
-				if (isset($this->vars[$varName]))
+				if (isset($this->vars[$varName])) {
 					$p = str_replace("[[=$varName]]", $this->vars[$varName], $p);
+				}
+				else {
+					if (REMOVENONEXISTENT)
+						$p = str_replace("[[=$varName]]", '', $p);
+				}
 			}
 			
 			$o = $pos+1;
@@ -308,8 +322,11 @@ class Template {
 			$templatePath = (file_exists("$templatePath.php") ? "$templatePath.php" : 
 				(file_exists("$templatepath.html") ? "$templatePath.html" : ''));
 
-			if ($templatePath == '')
+			if ($templatePath == '') {
+				if (REMOVENONEXISTENT)
+					$p = str_replace("[[.$templateName]]", '', $p);
 				continue;
+			}
 			
 			$template = $this->readFile($templatePath);
 			$template = $this->processVariables($template);
@@ -366,10 +383,25 @@ class Site {
 				$content = self::processFile(ROOTDIR.'/system/edit.php');
 				break;
 			case '/login':
-				$content = self::processFile(ROOTDIR.'system/login.php');
+				$ret = (isset($_GET['ret']) ? $_GET['ret'] : '/');
+				
+				if (Auth::validate()) {
+					header("Location: $ret");
+					break;
+				}
+				
+				if ( isset($_POST['username']) && isset($_POST['password']) ) {
+					$u = Auth::login($_POST['username'], $_POST['password']);
+					header("Location: $ret");
+					break;
+				}
+				
+				$content = Auth::getAuthForm();
 				break;
 			case '/logout':
-				$content = self::processFile(ROOTDIR.'system/logout.php');
+				Auth::logout();
+				$ret = (isset($_GET['ret']) ? $_GET['ret'] : '/');
+				header("Location: $ret");
 				break;
 			default:
 				$content = self::processPage($p);

@@ -1,10 +1,8 @@
 <?php
 require_once 'core.php';
+if (!Auth::validate()) header('Location: /');
+
 header('Content-type: text/html; charset=utf-8');
-
-$ret = '/edit?' . $_SERVER['QUERY_STRING'];
-if (!Auth::validate()) header('Location: /login?ret=' . $ret);
-
 
 if(isset($_POST['db_id'])) {
 	$id = DB::saveFormData('content');
@@ -33,8 +31,8 @@ $l = DB::getRows('content',"`type`=$type");
 // FORM ///////////////////////////////////////////////////////////////////////
 ?>
 
-<script src="system/js/jquery-1.7.1.min.js" language="JavaScript"></script>
-<script src="system/js/jquery.cookie.js" language="JavaScript"></script>
+<script src="<?php echo THEME; ?>/js/libs/jquery-1.7.1.min.js" language="JavaScript"></script>
+<script src="<?php echo THEME; ?>/js/libs/jquery.cookie.js" language="JavaScript"></script>
 
 <script>
 	$(document).ready(function(){
