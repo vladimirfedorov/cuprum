@@ -22,6 +22,9 @@ define('ROOTDIR', $_SERVER['DOCUMENT_ROOT'].'/');
 // web path
 define('ROOT', '/');
 
+// site address
+define('SITEADDRESS', 'http://cuprum.vladimirfedorov.net');
+
 // system core file
 define('CORE', ROOTDIR.'/system/core.php');
 

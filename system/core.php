@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once ROOTDIR.'/system/plugins/markdown/markdown.php';
 
 // classes
 
@@ -210,7 +211,7 @@ class Template {
 		$template = $this->processVariables($template);
 		$template = $this->processPlugins($template);
 		$template = $this->processTemplates($template);
-				
+		
 		return $template;
 	}
 	
@@ -246,7 +247,10 @@ class Template {
 				$varName = $ex[0];
 				$varDim = $ex[1];
 				if (isset($this->vars[$varName][$varDim])) {
-					$p = str_replace("[[=$varNameFull]]", $this->vars[$varName][$varDim], $p);
+					if ($varName == 'P' && ($varDim == 'text' || $varDim == 'excerpt'))
+						$p = str_replace("[[=$varNameFull]]", Markdown($this->vars[$varName][$varDim]), $p);
+					else
+						$p = str_replace("[[=$varNameFull]]", $this->vars[$varName][$varDim], $p);
 				}
 				else {
 					if (REMOVENONEXISTENT)
@@ -379,23 +383,28 @@ class Site {
 		
 		// predefined routes
 		switch ($p) {
-			case '/edit': 	// edit
+			case '/edit': 
 				$content = self::processFile(ROOTDIR.'/system/edit.php');
 				break;
-			case '/login':
+			case '/settings':
+				break;
+			case '/login': 
 				$ret = (isset($_GET['ret']) ? $_GET['ret'] : '/');
 				
+				// user is logged in
 				if (Auth::validate()) {
 					header("Location: $ret");
 					break;
 				}
 				
+				// user has sent valid name and password
 				if ( isset($_POST['username']) && isset($_POST['password']) ) {
 					$u = Auth::login($_POST['username'], $_POST['password']);
 					header("Location: $ret");
 					break;
 				}
 				
+				// show the form
 				$content = Auth::getAuthForm();
 				break;
 			case '/logout':

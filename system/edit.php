@@ -30,61 +30,9 @@ $l = DB::getRows('content',"`type`=$type");
 
 // FORM ///////////////////////////////////////////////////////////////////////
 ?>
-
-<script src="<?php echo THEME; ?>/js/libs/jquery-1.7.1.min.js" language="JavaScript"></script>
-<script src="<?php echo THEME; ?>/js/libs/jquery.cookie.js" language="JavaScript"></script>
-
-<script>
-	$(document).ready(function(){
 		
-		$("#more").click(function(){
-			$("#panel_more").slideToggle();
-			$("#more").text(
-				$("#more").text() == 'More' ? 'Less' : 'More'
-			);
-		})
-	})
-	
-	function updVal() {
-		$("input:checkbox").each(function(i,obj){
-			$("#db_"+obj.id).val(
-				obj.checked ? 1 : 0
-			);
-		})
-	}
-</script>
-
-<style>
-	#list { float:left;width:15%;height:400px; overflow:auto; border-right:1px dotted black;}
-	#list a {display:block; font-size:90%;}
-	a.active{color:black; font-weight:bold;}
-	#panel { width:80%; float:left; margin-left:1%; text-align:left;}
-	.bk {display: block;}
-	.bkfull {display: block; width:100%;}
-	textarea {font-family: sans-serif;}
-	#panel label {margin:0;padding-top:8px;color:#444; font-size:80%;}
-	#panel_options {padding-top:8px; padding-bottom:8px; background-color: #eef;}
-	#panel_options label {margin-top:8px;color:#444; font-size:100%; margin-right:16px;}
-	
-	#title{font-size:130%;}
-	#excerpt {height:40px;}
-	#text {height:200px;}
-	
-	#panel_more{float:none; }
-	#panel_more_right {float:right; width:45%; margin-top:2px;}
-	#panel_more_left { width:45%; margin-right:5%;}
-	#btnSave {padding:4px 20px;margin:-3px 8px 0 0; float:right;}
-	.createLinks{ padding-left:16%; margin-bottom: 8px;}
-	.createLinks a{color:black;margin-right:8px;}
-</style>
-
-<div class="createLinks">
-	<a href="?type=0">Pages</a>
-	<a href="?type=1">Posts</a>
-	<a href="?id=0&type=<?php echo $type ?>">Create new</a>
-</div>
-
 <form name="editor" id="editor" method="post" action="<?php echo $_SERVER['REQUEST_URI'] ?>">
+	<div>
 	<div id="list">  
 
 		<?php
@@ -133,6 +81,16 @@ $l = DB::getRows('content',"`type`=$type");
 			<a id="more" href="javascript:void();">More</a>
 		</div>
 		<div id="panel_more" style="display:none;">
+			<div id="panel_more_left">
+				<label for="permalink" class="bk">Permalink</label>
+				<input id="permalink" name="db_permalink" class="bkfull" type="text" value="<?php echo $r['permalink'] ?>" />
+
+				<label for="tags" class="bk">Tags</label>
+				<input id="tags" name="db_tags" class="bkfull" type="text" value="<?php echo $r['tags'] ?>" />
+				
+				<label for="template" class="bk">Template</label>
+				<input id="template" name="db_template" class="bkfull" type="text" value="<?php echo $r['template'] ?>" />
+			</div>
 			<div id="panel_more_right">
 				<label for="publishdate" class="bk">Publish date</label>
 				<input id="publishdate" name="db_publishdate" class="bkfull" type="text" value="<?php echo $r['publishdate'] ?>" />
@@ -151,20 +109,28 @@ $l = DB::getRows('content',"`type`=$type");
 					?>
 				</select>
 			</div>
-			<div id="panel_more_left">
-				<label for="permalink" class="bk">Permalink</label>
-				<input id="permalink" name="db_permalink" class="bkfull" type="text" value="<?php echo $r['permalink'] ?>" />
-
-				<label for="tags" class="bk">Tags</label>
-				<input id="tags" name="db_tags" class="bkfull" type="text" value="<?php echo $r['tags'] ?>" />
-				
-				<label for="template" class="bk">Template</label>
-				<input id="template" name="db_template" class="bkfull" type="text" value="<?php echo $r['template'] ?>" />
-			</div>
 		</div>
-
-			
 		
+	</div>
 	</div>
 </form>
 
+<script>
+	$(document).ready(function(){
+		
+		$("#more").click(function(){
+			$("#panel_more").slideToggle();
+			$("#more").text(
+				$("#more").text() == 'More' ? 'Less' : 'More'
+			);
+		})
+	})
+	
+	function updVal() {
+		$("input:checkbox").each(function(i,obj){
+			$("#db_"+obj.id).val(
+				obj.checked ? 1 : 0
+			);
+		})
+	}
+</script>
