@@ -31,9 +31,7 @@
 		<div class="sitename"><a href='/'>cuprum</a></div>
 		<div id="menu">
 			<ul>
-				<li><a href="?type=0">Pages</a></li>
-				<li><a href="?type=1">Posts</a></li>
-				<li><a href="?id=0&type=<?php echo $type ?>">Create new</a></li>
+				[[=menu]]
 			</ul>
 		</div>
 		

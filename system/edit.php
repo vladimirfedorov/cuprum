@@ -27,6 +27,12 @@ if (is_null($type))
 
 $l = DB::getRows('content',"`type`=$type");
 
+$menu = '<li><a href="?type=0">Pages</a> </li>' .
+	'<li><a href="?type=1">Posts</a> </li>' .
+	'<li><a href="?id=0&type='.$type.'">Create new</a> </li>';
+
+Template::assign('menu', $menu);
+
 
 // FORM ///////////////////////////////////////////////////////////////////////
 ?>
@@ -51,7 +57,7 @@ $l = DB::getRows('content',"`type`=$type");
 	<div id="panel">
 		<label class="bk">Options</label>
 		<div id="panel_options">
-			<nobr><input id="draft" type="checkbox" <?php echo $r['draft']==1 ? 'checked' : ''?> />
+			<nobr><input id="draft" type="checkbox" <?php echo ($r['draft']==1 || $r['id']==0) ? 'checked' : ''?> />
 			<input id="db_draft" name="db_draft" type="hidden" value="" />
 			<label for="draft">Draft</label></nobr>
 
