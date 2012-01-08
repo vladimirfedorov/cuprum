@@ -37,7 +37,7 @@
 			</ul>
 		</div>
 		
-		<a class="admin" href="/logout?ret=/"><img src="<?php echo THEME.'/images/unlock.png'; ?>" width="13" height="13" title="Logout" alt='' />&nbsp;Log out</a>
+		<a class="admin" href="/logout?ret=/"><img src="[[=S.THEMEURL]]/images/unlock.png" width="13" height="13" title="Logout" alt='' />&nbsp;Log out</a>
 
 
     </header>

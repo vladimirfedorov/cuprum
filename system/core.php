@@ -194,15 +194,37 @@ class Template {
 	/// Template variables	
 	var $vars = array();
 	
+	/// Path to theme
+	var $themePath = '';
+		
+	/// Constructor
+	function Template() {
+		$this->themePath = ROOTDIR.'/system/themes/default';
+		$t =  '/user/themes/' . THEME;
+		if (is_dir(ROOTDIR . $t)) {
+			$this->themePath = $t;
+		}
+		else {
+			$t = '/system/themes/' . THEME;
+			if (is_dir(ROOTDIR . $t))
+				$this->themePath = $t;
+		}
+		
+		define('THEMEDIR', str_replace('//', '/', ROOTDIR . $this->themePath));
+		define('THEMEURL', str_replace('//', '/', ROOT . $this->themePath));
+		global $config;
+		$config['THEMEURL'] = THEMEURL;
+	}
+	
 	/// Process template
 	function process($templateName)	{
 		if ($templateName == '')
 			$templateName = 'default';
 		
-		$templateName = ROOTDIR.THEME."/$templateName.php";
+		$templateName = THEMEDIR . "/$templateName.php";
 
 		if (!file_exists($templateName)) 
-			$templateName = ROOTDIR.THEME.'/default.php';
+			$templateName = THEMEDIR . '/default.php';
 		
 		if (!file_exists($templateName))
 			return "Template not found: $templateName";
@@ -288,8 +310,8 @@ class Template {
 			$ex = explode(' ', $pluginName);	
 			$pluginName = $ex[0];
 				
-			$up = ROOTDIR.USERPLUGINS.$pluginName . '/main.php';
-			$sp = ROOTDIR.SYSTEMPLUGINS.$pluginName . '/main.php';
+			$up = ROOTDIR.'/user/plugins/'.$pluginName . '/main.php';
+			$sp = ROOTDIR.'/system/plugins/'.$pluginName . '/main.php';
 			
 			$pluginPath = (file_exists($up) ? $up : 
 				(file_exists($sp) ? $sp : ''));
@@ -321,7 +343,7 @@ class Template {
 			$templateNameEnd = strpos($p, ']]', $templateNameStart);
 			$templateName = substr($p, $templateNameStart, ($templateNameEnd-$templateNameStart));
 				
-			$templatePath = ROOTDIR.THEME."/$templateName";
+			$templatePath = THEMEDIR . "/$templateName";
 			
 			$templatePath = (file_exists("$templatePath.php") ? "$templatePath.php" : 
 				(file_exists("$templatepath.html") ? "$templatePath.html" : ''));
@@ -335,7 +357,6 @@ class Template {
 			$template = $this->readFile($templatePath);
 			$template = $this->processVariables($template);
 			$template = $this->processPlugins($template);
-			
 			
 			$p = str_replace("[[.$templateName]]", $template, $p);
 			
@@ -428,9 +449,11 @@ class Site {
 			$p = 'home';
 
 		// process template
+		global $config;
 		$p = self::getPageRec($p);
 		$t = new Template();
 		$t->assign('P', $p);
+		$t->assign('S', $config);
 		$content = $t->process($p['template']);
 		
 		return $content;
@@ -438,9 +461,11 @@ class Site {
 	
 	/// Display a file using default file template
 	function processFile($f) {
+		global $config;
 		$t = new Template();
 		$c = $t->readFile($f);
 		$t->assign('P', $c);
+		$t->assign('S', $config);
 		$content = $t->process(FILETEMPLATE);
 		
 		return $content;
@@ -452,6 +477,7 @@ class Site {
 		if ($r != null)
 			return $r;
 	}
+	
 }
 
 
