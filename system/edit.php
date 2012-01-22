@@ -6,9 +6,9 @@ header('Content-type: text/html; charset=utf-8');
 
 if(isset($_POST['db_id'])) {
 	$id = DB::saveFormData('content');
-	
-	if ($_POST['db_id'] == ''){
-		header("Location: edit.php?id=$id");
+
+	if ($_POST['db_id'] == 0){
+		header("Location: /edit?id=$id");
 		exit;
 	};
 }
@@ -29,6 +29,7 @@ $l = DB::getRows('content',"`type`=$type");
 
 $menu = '<li><a href="?type=0">Pages</a> </li>' .
 	'<li><a href="?type=1">Posts</a> </li>' .
+	'&nbsp;|&nbsp;'.
 	'<li><a href="?id=0&type='.$type.'">Create new</a> </li>';
 
 Template::assign('menu', $menu);
@@ -69,14 +70,17 @@ Template::assign('menu', $menu);
 			<input id="db_requireauth" name="db_requireauth" type="hidden" value="" />
 			<label for="requireauth">Require authorization</label></nobr>
 
-			<nobr><input id="deleted" type="checkbox" <?php echo $r['deleted']==1 ? 'checked' : ''?> />
-			<input id="db_deleted" name="db_deleted" type="hidden" value="" />
-			<label for="deleted">Deleted</label></nobr>
 
-			<input id="btnSave" type="submit" value="Save" onclick="updVal();">	
+			<input id="btnSave" type="submit" value="Save" onclick="updVal();" />	
+			<?php if ($id != 0) { ?>
+			<input id="btnDelete" type="submit" value="<?php echo ($r['deleted']==1 ? 'Undelete' : 'Delete')?>" onclick="toggleDelete();updVal();" />
+			<?php } ?>
+
 		</div><!-- panel_options -->
 		<input id="type" name="db_type" type="hidden" value="<?php echo $type; ?>" />
-		<input id="id"   name="db_id"   type="hidden" value="<?php echo $r['id']; ?>" />
+		<input id="id"   name="db_id"   type="hidden" value="<?php echo $id; ?>" />
+		<input id="db_deleted" name="db_deleted" type="hidden" value="<?php echo $r['deleted']; ?>" />
+
 		<label for="title" class="bk">Title</label>
 		<input id="title" name="db_title" class="bkfull" type="text" value="<?php echo $r['title'] ?>" />
 		<label for="excerpt" class="bk">Excerpt</label>
@@ -109,8 +113,9 @@ Template::assign('menu', $menu);
 					<option value="0"></option>
 					<?php
 						foreach ($l as $v) {
+							$sel = ($r['parentid'] == $v['id'] ? ' selected' : ''); 
 							if ($v['id'] != $id && $v['deleted'] != 1)
-								echo "<option value='{$v['id']}'>{$v['title']}</option>";
+								echo "<option value='{$v['id']}' $sel>{$v['title']}</option>";
 						}
 					?>
 				</select>
@@ -138,5 +143,12 @@ Template::assign('menu', $menu);
 				obj.checked ? 1 : 0
 			);
 		})
+	}
+	
+	function toggleDelete() {
+		//alert('#db_deleted: '+$('#db_deleted').val());
+		$('#db_deleted').val(function(i,val) { 
+			return (val == '1' ? '0' : '1'); 
+		});
 	}
 </script>

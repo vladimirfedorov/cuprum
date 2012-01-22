@@ -1,6 +1,6 @@
 <?php
 include_once CORE;
-if (Auth::validate()) {
+if (Auth::validate() && $params[1]!='') {
 ?>
 
 <a href="/edit?id=<?php echo $params[1]; ?>">

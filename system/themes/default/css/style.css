@@ -13,10 +13,12 @@ h1 {color:#999;font-weight:400; font-size:200%;}
 h2 {color:#444;font-weight:400; font-size:150%;}
 h3 {color:black;font-weight:700; font-size:110%;}
 h4 {color:#444;font-weight:400; font-size:90%; text-transform:uppercase;}
+input,button,select {font-family: 'Noticia Text', serif; font-size: 16px;}
+
 /* Login/logout box */
 #admin {display: inline;}
 .admin {font-size:90%; text-decoration: none; }
 #loginForm {display:none;}
 #loginForm Form {display: inline;}
-#loginForm .loginFormInput {width:80px;}
+#loginForm .loginFormInput {width:80px;font-size:80%;}
 

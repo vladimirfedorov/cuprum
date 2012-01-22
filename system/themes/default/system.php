@@ -9,7 +9,7 @@
 	#panel .bkfull {display: block; width:99%;}
 	#panel textarea {font-family: sans-serif;}
 	#panel label {margin:0;padding-top:8px;color:#444; font-size:80%;}
-	#panel_options {padding-top:8px; padding-bottom:8px; background-color: #eef;}
+	#panel_options {padding-top:12px; padding-bottom:12px; background-color: #eef;}
 	#panel_options label {margin-top:8px;color:#444; font-size:100%; margin-right:16px;}
 	
 	#title{font-size:130%;}
@@ -19,7 +19,9 @@
 	#panel_more{float:none;}
 	#panel_more_right {float:left; width:48%; }
 	#panel_more_left {float:left; width:48%; margin-right:4%;}
-	#btnSave {padding:4px 20px;margin:-3px 8px 0 0; float:right;}
+	
+	#btnSave,#btnDelete {padding:4px 20px;margin:-6px 8px 0 0; float:right;}
+	
 </style>
 
 </head>

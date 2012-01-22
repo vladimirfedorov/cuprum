@@ -28,7 +28,7 @@ class DB {
 	/// Get row collection
 	function getRows($table, $cond) {
 		$rows = Array(); 
-		$result = mysql_query("Select * From `$table`" . 
+		$result = mysql_query("Select * From `".TABPREFIX."$table`" . 
 			($cond == "" ? "" : " Where $cond"));
 		if ($result === false)
 			return null;
@@ -51,7 +51,7 @@ class DB {
 
 	/// Get one row
 	function getRow($table, $cond) {
-		$result = mysql_query("Select * From `$table` " . 
+		$result = mysql_query("Select * From `".TABPREFIX."$table` " . 
 			($cond == "" ? "" : "Where $cond"));
 		if ($result === false)
 			return null;
@@ -90,7 +90,8 @@ class DB {
         $fields = substr($fields,0,-1);
         
         if ($fields != "") {
-            $query = "Update $table Set $fields Where `id`=$id";
+            $query = "Update `".TABPREFIX."$table` Set $fields Where `id`=$id";
+			//echo $query;
             $res = mysql_query($query);
             if ($res)
                 return $id;
@@ -117,8 +118,8 @@ class DB {
         $values = substr($values,0,-1);
         
         if ($fields != "") {
-            $query = "Insert Into $table ($fields) Values ($values);";
-            //echo $query;
+            $query = "Insert Into `".TABPREFIX."$table` ($fields) Values ($values);";
+			//echo $query;
             $res = mysql_query($query);
             if ($res)
                 return mysql_insert_id();
@@ -384,14 +385,22 @@ class Site {
 
 	/// Constructor
 	function Site() {
-		// connect to the specified database
-		// configure the connection
-		$conn = mysql_connect(DBHOST, DBUSER, DBPWD)
-			   or die ("Not connected: " . mysql_error());
+		$p = strtolower($_SERVER['REQUEST_URI']);
+		$p = explode('?', $p);
+		$p = $p[0];
 		
-		mysql_select_db(DBNAME, $conn) or die ("Can't use {DBNAME} " . mysql_error());
-		
-		DB::execQuery('SET NAMES utf8');
+		// Don't connect for settings 
+		if (!($p == '/settings')) {		
+			
+			// connect to the specified database
+			// configure the connection
+			$conn = mysql_connect(DBHOST, DBUSER, DBPWD)
+				   or die ("Not connected: " . mysql_error());
+			
+			mysql_select_db(DBNAME, $conn) or die ("Can't use ".DBNAME.". " . mysql_error());
+			
+			DB::execQuery('SET NAMES utf8');
+		}
 	}
 		
 	/// Show page
@@ -408,6 +417,7 @@ class Site {
 				$content = self::processFile(ROOTDIR.'/system/edit.php');
 				break;
 			case '/settings':
+				$content = self::processFile(ROOTDIR.'/system/setup.php');
 				break;
 			case '/login': 
 				$ret = (isset($_GET['ret']) ? $_GET['ret'] : '/');
