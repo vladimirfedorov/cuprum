@@ -20,6 +20,16 @@
     <hr />
     <div id="main" role="main">
 	[[:sys.blog.roll]]
+
+	[[{Blog]]	
+	<h3><a href="/blog/[[I.ref]]">
+		[[I.title]]</a> </h3>
+	<small>[[I.publishdate]]</small>
+	<p>[[I.excerpt]]</p>	
+	<hr class="dotted" />
+
+	[[}]]
+
     </div>
     <hr />
     <footer>

@@ -1,0 +1,39 @@
+#list { width:20%; border-right:1px solid #ccf; height:100px; overflow:auto; float:left; }
+#list a {font-size:90%;}
+#list a.active{color:black; font-weight:bold;}
+#list ul, li {margin:0; padding:0; list-style:none;}
+#list li.addnew {line-height: 180%;}
+#panel { width:78%; float:right; text-align:left;}
+#panel .bk {display: block;}
+#panel .bkfull {display: block; width:99%;}
+#panel textarea {font-family: sans-serif; }
+#panel label {margin:0;padding-top:8px;color:#444; font-size:80%;}
+#panel_options {padding-top:12px; padding-bottom:12px; background-color: #eef;}
+#panel_options label {margin-top:8px;color:#444; font-size:100%; margin-right:16px;}
+
+#filters {font-size:80%; background-color:#eee; margin-bottom:4px; padding:2px 8px; border:1px solid #ddd;}
+#filters input {font-size:80%;}
+#filters input.submit {font-size:100%;}
+#filters img.info {cursor:pointer;}
+
+#title{font-size:130%;}
+#excerpt {height:40px;}
+#text {height:300px;}
+
+#panel_more {width:100%; margin:8px 0; margin-bottom: 20px;}
+#panel_more input {font-size:90%;}
+#panel_more select {font-size:90%;}
+.panel_more_col {width:48%; }
+
+.table {display:table;}
+.trow {display:table-row;}
+.tcell {display: table-cell;}
+
+
+#btnSave,#btnDelete {padding:4px 20px;margin:-6px 8px 0 0; float:right;}
+
+.imagelist {font-size:80%; background-color:#eee; margin-bottom:4px; padding:2px 8px; border:1px solid #ddd; overflow:auto;}
+.imagelist img {border: 6px solid #eee;}
+.imagelist img.active {border-color:#44f;}
+.imageadd {padding:0;margin:0;width:0;height:0;overflow:hidden;}
+.addfile {margin:10px 0;}

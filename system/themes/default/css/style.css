@@ -21,4 +21,6 @@ input,button,select {font-family: 'Noticia Text', serif; font-size: 16px;}
 #loginForm {display:none;}
 #loginForm Form {display: inline;}
 #loginForm .loginFormInput {width:80px;font-size:80%;}
-
+#btnDeleteFile { color:red;}
+#pnlImageOptions{display:none;}
+.dotted {border-bottom-style: dotted;}

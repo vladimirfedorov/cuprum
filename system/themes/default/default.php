@@ -8,9 +8,9 @@
 		<div class="sitename"><a href='/'>cuprum</a></div>
 		<div id="menu">
 			<ul>
-				<li><a href="/blog">Blog</a></li>
-				<li><a href="/about">About</a></li>
-				<li><a href="/articles">Articles</a></li>
+				<li><a href="blog">Blog</a></li>
+				<li><a href="about">About</a></li>
+				<li><a href="articles">Articles</a></li>
 			</ul>
 		</div>
 		<div id="admin">

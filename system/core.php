@@ -26,16 +26,30 @@ class DB {
 	}
 	
 	/// Get row collection
-	function getRows($table, $cond) {
+	function getRows($table, $cond, $calcFields='') {
 		$rows = Array(); 
-		$result = mysql_query("Select * From `".TABPREFIX."$table`" . 
-			($cond == "" ? "" : " Where $cond"));
+		$result = mysql_query("Select *" .
+			($calcFields == '' ? '' : ", $calcFields") .
+			" From `".TABPREFIX."$table`" . 
+			($cond == '' ? '' : " Where $cond"));
 		if ($result === false)
 			return null;
-		while($row=mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
 			$rows[] = $row;
 		}
 		return $rows;
+	}
+
+	/// Get number of rows 
+	function getRowsCount($table, $cond) {
+		$rows = Array(); 
+		$result = mysql_query("Select count(*) as cnt From `".TABPREFIX."$table`" . 
+			($cond == "" ? "" : " Where $cond"));
+		if ($result === false)
+			return null;
+		$row = mysql_fetch_array($result, MYSQL_ASSOC);
+			
+		return ($row["cnt"]);
 	}
 
 	/// Get one row
@@ -234,6 +248,7 @@ class Template {
 		$template = $this->processVariables($template);
 		$template = $this->processPlugins($template);
 		$template = $this->processTemplates($template);
+		$template = $this->processIterators($template);
 		
 		return $template;
 	}
@@ -252,6 +267,43 @@ class Template {
 	/// Delete all template vaiables
 	function clearAll() {
 		$this->vars = array();
+	}
+	
+	/// Process iterators
+	function processIterators($p) {
+		$o = 0;
+		$maxSteps = MAXITERATIONS;
+		
+		while (false !== ($pos = strpos($p, '[[{', $o)) && (--$maxSteps>0)) {
+			$varNameStart = $pos + 3;
+			$varNameEnd = strpos($p, ']]', $varNameStart);
+			$varName = substr($p, $varNameStart, ($varNameEnd-$varNameStart));
+			$closingTag = strpos($p, '[[}]]', $varNameEnd);
+			$iBlock = substr($p, $pos, $closingTag-$pos+5);
+			$iContent = substr($p, $varNameEnd+2, $closingTag-$varNameEnd-2);
+			$iReplacement = '';
+			
+			if (isset($this->vars[$varName]) && is_array($this->vars[$varName])) {
+				foreach($this->vars[$varName] as $key=>$value) {
+					$tmp = $iContent;
+					$tmp = str_replace('[[I#]]', "$key", $tmp);
+					$tmp = str_replace('[[I', "[[=I_$key", $tmp);
+					$this->vars["I_$key"] = $value;
+					$iReplacement .= $tmp;
+				}
+			}
+			
+			$iReplacement = $this->processVariables($iReplacement);
+			$p = str_replace($iBlock, $iReplacement, $p);	
+
+			$o = $pos+1;
+			if ($o > strlen($p))
+				break;
+		}
+
+		$p = $this->processVariables($p);
+		
+		return $p;
 	}
 	
 	/// Process all variables ([[=varname]] or [[=array.element]])
@@ -443,6 +495,14 @@ class Site {
 				$ret = (isset($_GET['ret']) ? $_GET['ret'] : '/');
 				header("Location: $ret");
 				break;
+			case '/api':
+				ob_start();
+				include '/system/api.php';
+				$content = ob_get_contents();
+				ob_end_clean();
+				break;
+			case '/blog':
+
 			default:
 				$content = self::processPage($p);
 				break;
@@ -464,6 +524,7 @@ class Site {
 		$t = new Template();
 		$t->assign('P', $p);
 		$t->assign('S', $config);
+		$t->assign('TEST', $test);
 		$content = $t->process($p['template']);
 		
 		return $content;
@@ -489,7 +550,6 @@ class Site {
 	}
 	
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 

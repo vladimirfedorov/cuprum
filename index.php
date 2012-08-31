@@ -1,3 +1,3 @@
 <?php
-include	'system/core.php';
+require	'system/core.php';
 ?>

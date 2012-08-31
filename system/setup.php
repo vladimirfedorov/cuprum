@@ -60,6 +60,11 @@ Template::assign('menu', $menu);
 <div><label for="THEME">Theme:</label><input id="THEME" name="cfg_THEME" class="fld" type="text" value='[[=S.THEME]]' /></div>	
 	<br />
 
+	<h4>Media:</h4>
+<div><label for="MAXIMAGEWIDTH">Max image width:</label><input id="MAXIMAGEWIDTH" name="cfg_MAXIMAGEWIDTH" class="fld" type="text" value='[[=S.MAXIMAGEWIDTH]]' /></div>	
+<div><label for="MAXIMAGEHEIGHT">Max image height:</label><input id="MAXIMAGEHEIGHT" name="cfg_MAXIMAGEHEIGHT" class="fld" type="text" value='[[=S.MAXIMAGEHEIGHT]]' /></div>	
+<div><label for="MAXTHMBHEIGHT">Max thumbnail height:</label><input id="MAXTHMBHEIGHT" name="cfg_MAXTHMBHEIGHT" class="fld" type="text" value='[[=S.MAXTHMBHEIGHT]]' /></div>
+	<br />
 
 	<h4>Database settings:</h4>
 <div><label for="DBHOST">Host:</label><input id="DBHOST" name="cfg_DBHOST" class="fld" type="text" value='[[=S.DBHOST]]' /></div>	
